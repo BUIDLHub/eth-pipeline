@@ -112,7 +112,7 @@ export default class Pipeline {
         log.debug("\nStarting block processing-----",block.number,"-------");
         await this._prepareHandlers((ctx,handler,next,reject)=>{
             log.debug("Processing block using handler", handler.name);
-            return handler.newBlock(ctx, block, next,reject)
+            return handler.newBlock(ctx, block, next, reject)
         })
         log.debug("\nEnding block processing-----",block.number,"-------");
     }
@@ -133,13 +133,17 @@ export default class Pipeline {
         }
         
         let idx = 0;
+        let reject = async () => {
+            log.debug("Handler", this._handlers[idx].name, "rejected block. Short-ciruiting pipeline");
+        }
+
         let next = async () => {
             ++idx;
             if(idx < this._handlers.length) {
                 let h = this._handlers[idx];
                 log.debug("Calling handler", h.name)
                 try {
-                    await fn(ctx, h, next);
+                    await fn(ctx, h, next, reject);
                 } catch (e) {
                     log.error("Problem with block handler", h.name, e);
                 }
@@ -148,9 +152,7 @@ export default class Pipeline {
             }
         }
 
-        let reject = async () => {
-            log.debug("Handler", this._handlers[idx].name, "rejected block. Short-ciruiting pipeline");
-        }
+        
 
         try {
             let h = this._handlers[0];
