@@ -3,6 +3,8 @@ import Poller from './PollingDataSource';
 import Web3 from 'web3';
 import Handler from './Handler';
 import {sleep} from 'buidl-utils';
+import AddTransactions from './handlers/appendTransactions';
+import AddReceipts from './handlers/appendReceipts';
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -84,6 +86,24 @@ describe("Pipeline", ()=>{
 
         }, 10);
     });
+
+    it("Should append txns and receipts", done=>{
+        let txns = new AddTransactions();
+        let receipts = new AddReceipts();
+        let end = new TestHandler({name: "Last"});
+        pipeline.use(txns).use(receipts).use(end);
+
+        pipeline.start().then(async ()=>{
+            while(end.newCount === 0) {
+                await sleep(1000);
+            }
+            await pipeline.stop();
+            if(end.receiptCount === 0) {
+                return done(new Error("Did not get receipts in pipeline"));
+            }
+            done();
+        })
+    }).timeout(30000);
 });
 
 
@@ -92,19 +112,25 @@ class TestHandler extends Handler {
         super(props);
         this.newCount = 0;
         this.purgeCount= 0;
+        this.receiptCount = 0;
         [
-            'init',
             'newBlock',
             'purgeBlock'
         ].forEach(fn=>this[fn]=this[fn].bind(this));
     }
 
-    async init(ctx, next) {
-       return next();
-    }
 
     async newBlock(ctx, block, next, reject) {
         ++this.newCount;
+        if(block.transactions && block.transactions.length > 0) {
+            block.transactions.forEach(t=>{
+                if(t.receipt) {
+                    ++this.receiptCount;
+                }
+            })
+        }
+        console.log("Finished newBlock for handler", this.name)
+
         return next();
     }
 
