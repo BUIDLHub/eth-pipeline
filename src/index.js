@@ -3,11 +3,13 @@ import {default as PollingDataSource} from './PollingDataSource';
 import {default as SubscriptionDataSource} from './SubscriptionDataSource';
 import {defualt as EnsureTransactionsHandler} from './handlers/appendTransactions';
 import {default as AddReceiptsHandler} from './handlers/appendReceipts';
+import {default as FilterAddressHandler} from './handlers/filterAddress';
 
 export {
     Pipeline,
     PollingDataSource,
     SubscriptionDataSource,
     EnsureTransactionsHandler,
-    AddReceiptsHandler
+    AddReceiptsHandler,
+    filterAddressHandler
 }
