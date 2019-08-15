@@ -3,12 +3,11 @@ import Pipeline from './Pipeline';
 import Poller from './PollingDataSource';
 import Web3 from 'web3';
 import Handler from './Handler';
-import {sleep} from 'buidl-utils';
 import AddTransactions from './handlers/appendTransactions';
 import AddReceipts from './handlers/appendReceipts';
 import ETHHistory from 'eth-history';
 import FilterAddress from './handlers/filterAddress';
-import ABIDecodeHandler from './handlers/ABIDecoderHandler';
+import ABIDecodeHandler from './handlers/ABIDecodeHandler';
 import _ from 'lodash';
 
 const dotenv = require("dotenv");

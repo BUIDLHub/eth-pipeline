@@ -4,6 +4,7 @@ import {default as SubscriptionDataSource} from './SubscriptionDataSource';
 import {default as EnsureTransactionsHandler} from './handlers/appendTransactions';
 import {default as AddReceiptsHandler} from './handlers/appendReceipts';
 import {default as FilterAddressHandler} from './handlers/filterAddress';
+import {default as ABIDecodeHandler} from './handlers/ABIDecoderHandler';
 
 export {
     Pipeline,
@@ -11,5 +12,6 @@ export {
     SubscriptionDataSource,
     EnsureTransactionsHandler,
     AddReceiptsHandler,
-    FilterAddressHandler
+    FilterAddressHandler,
+    ABIDecodeHandler
 }
