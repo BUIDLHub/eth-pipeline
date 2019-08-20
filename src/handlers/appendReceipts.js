@@ -28,18 +28,22 @@ export default class ReceiptHandler extends Handler {
             retryNullResults: true
         });
         txns.forEach(t=>{
-            all.push(retry.invoke(ctx.web3.eth.getTransactionReceipt,async (e, r)=>{
-                if(e) {
-                    log.error("Problem retrieving receipt", e);
-                } else if(r) {
-                    t.receipt = r;
-                } else {
-                    log.error("Did not get receipt in results");
-                }
-            },t.hash));
+            if(t.hash && !t.receipt) {
+                all.push(retry.invoke(ctx.web3.eth.getTransactionReceipt,async (e, r)=>{
+                    if(e) {
+                        log.error("Problem retrieving receipt", e);
+                    } else if(r) {
+                        t.receipt = r;
+                    } else {
+                        log.error("Did not get receipt in results");
+                    }
+                },t.hash));
+            }
         });
-        await Promise.all(all);
-        log.debug("Retrieved", txns.length,"receipts in",(Date.now()-s),"ms");
+        if(all.length > 0) {
+            await Promise.all(all);
+            log.debug("Retrieved", txns.length,"receipts in",(Date.now()-s),"ms");
+        }
         return next();
     }
 }

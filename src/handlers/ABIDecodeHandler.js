@@ -34,6 +34,7 @@ export default class ABIDecodeHandler extends Handler {
     async newBlock(ctx, block, next, reject) {
         let txns = [];
         block.transactions.forEach(t=>{
+          if(!t.logEvents) {
             let events = this._decode(ctx, block, t);
             if(events.length > 0) {
                 t.logEvents = events.reduce((o,e)=>{
@@ -43,6 +44,7 @@ export default class ABIDecodeHandler extends Handler {
                     return o;
                 }, {});
             }
+          }
         });
         return next();
     }
