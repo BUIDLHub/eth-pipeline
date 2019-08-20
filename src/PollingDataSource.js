@@ -18,7 +18,7 @@ export default class PollingDataSource extends BlockDataSource {
         super(props);
         schema.validateSync(props);
         this.web3 = props.web3;
-        this.interval = props.interval;
+        this.interval = props.interval || 10000;
         this.lastBlock = props.lastKnownBlock;
         this.polling = true;
         this.stopCallback = null;

@@ -5,8 +5,10 @@ import {default as EnsureTransactionsHandler} from './handlers/appendTransaction
 import {default as AddReceiptsHandler} from './handlers/appendReceipts';
 import {default as FilterAddressHandler} from './handlers/filterAddress';
 import {default as ABIDecodeHandler} from './handlers/ABIDecodeHandler';
+import {default as Handler} from './Handler';
 
 export {
+    Handler,
     Pipeline,
     PollingDataSource,
     SubscriptionDataSource,
