@@ -29,7 +29,9 @@ export default class Pipeline {
         this.historyWindowSize = props.historyWindowSize || 50;
         this._blocks = props.blocks || [];
         this._handlers = [];
+        this.initialized = false;
         [
+            'init',
             'start',
             'stop',
             'use',
@@ -60,6 +62,25 @@ export default class Pipeline {
     }
 
     /**
+     * Init all handlers prior to either pushing blocks into the pipeline manually or starting
+     * subscription for new blocks.
+     */
+    async init() {
+        if(this._handlers.length === 0) {
+            throw new Error("No handlers installed in pipeline. Nothing to start without handlers");
+        }
+
+        if(this.initialized) {
+            return;
+        }
+        //first, initialize all handlers
+        await this._prepareHandlers((ctx,handler,next)=>{
+            return handler.init(ctx, next);
+        });
+        this.initialized = true;
+    }
+
+    /**
      * Start the pipeline's block source and run new blocks through installed handlers
      */
     async start() {
@@ -67,10 +88,9 @@ export default class Pipeline {
             throw new Error("No handlers installed in pipeline. Nothing to start without handlers");
         }
 
-        //first, initialize all handlers
-        await this._prepareHandlers((ctx,handler,next)=>{
-            return handler.init(ctx, next);
-        });
+        if(!this.initialized) {
+            await this.init();
+        }
 
         let sourceCallback = async (e, block) => {
             if(e) {
