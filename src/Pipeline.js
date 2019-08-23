@@ -30,6 +30,7 @@ export default class Pipeline {
         this._blocks = props.blocks || [];
         this._handlers = [];
         this.initialized = false;
+        this.running = false;
         [
             'init',
             'start',
@@ -91,6 +92,9 @@ export default class Pipeline {
         if(!this.initialized) {
             await this.init();
         }
+        if(this.running) {
+            return; //already started
+        }
 
         let sourceCallback = async (e, block) => {
             if(e) {
@@ -112,7 +116,8 @@ export default class Pipeline {
      * Stop block source and no longer receive new blocks
      */
     async stop() {
-        return this.blockSource.stop();
+        await this.blockSource.stop();
+        this.running = false;
     }
 
     /**
