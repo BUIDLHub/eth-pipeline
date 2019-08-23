@@ -37,10 +37,12 @@ export default class FilterAddress extends Handler {
             return false;
         });
 
+        /*
         if(txns.length === 0) {
             log.debug("Rejecting block since no matching txns found");
             return reject();
         }
+        */
         log.debug("Replacing block transactions with new set. Was", block.transactions.length, ", will now be", txns.length);
         block.transactions = txns;
         return next();
