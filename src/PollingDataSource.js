@@ -31,9 +31,20 @@ export default class PollingDataSource extends BlockDataSource {
 
     async start(cb) {
         return new Promise(async (done,err)=>{
+            let rel = await lock.acquire();
+            
+            try {
+                if(this.polling) {
+                    return done();
+                }
+                this.polling = true;
+            } finally {
+                rel();
+            }
+
             try {
                 let going = await this._isPolling();
-
+                
                 let s = Date.now();
                 let fatalError = null;
     
@@ -93,7 +104,7 @@ export default class PollingDataSource extends BlockDataSource {
                                 }
                             }, this.lastBlock+1, true);
                         } else {
-                            log.debug("No new blocks to retrieve, waiting for next poll cycle");
+                            log.debug("No new blocks to retrieve, waiting for next poll cycle", this.lastBlock, " === ", currentBlock);
                         }
     
                         going = await this._isPolling();

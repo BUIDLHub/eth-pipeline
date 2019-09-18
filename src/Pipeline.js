@@ -103,12 +103,16 @@ export default class Pipeline {
                 log.debug("Getting block", block.number);
                 if(this._blocks.length >= this.historyWindowSize) {
                     log.debug("Purging block to maintain block history window...");
-                    await this._purgeBlock();
+                    let rem = this.blocks.shift();
+                    await this._purgeBlock(rem);
                 }
                 this._blocks.push(block);
                 await this._processBlock(block);
+            } else {
+                log.warn("Getting null block and no error in pipeline");
             }
         }
+        log.debug("Starting block source");
         return this.blockSource.start(sourceCallback);
     }
 
