@@ -20,7 +20,7 @@ export default class PollingDataSource extends BlockDataSource {
         this.web3 = props.web3;
         this.interval = props.interval || 10000;
         this.lastBlock = props.lastKnownBlock;
-        this.polling = true;
+        this.polling = false;
         this.stopCallback = null;
         [
             'start',
