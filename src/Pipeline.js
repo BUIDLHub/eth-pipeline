@@ -103,7 +103,7 @@ export default class Pipeline {
                 log.debug("Getting block", block.number);
                 if(this._blocks.length >= this.historyWindowSize) {
                     log.debug("Purging block to maintain block history window...");
-                    let rem = this.blocks.shift();
+                    let rem = this._blocks.shift();
                     await this._purgeBlock(rem);
                 }
                 this._blocks.push(block);

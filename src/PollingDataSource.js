@@ -101,6 +101,8 @@ export default class PollingDataSource extends BlockDataSource {
                                         }
                                     }
                                     this.lastBlock = b.number;
+                                } else {
+                                    log.debug("Getting no block back from web3 for block:", this.lastBlock+1);
                                 }
                             }, this.lastBlock+1, true);
                         } else {
