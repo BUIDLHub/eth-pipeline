@@ -7,6 +7,7 @@ const schema = yup.object({
     web3: yup.object().required("PollingDataSource is missing web3"),
     interval: yup.number(), //defaults to 10 seconds
     lastKnownBlock: yup.number(), //defaults to current block-1
+    lagBlocks: yup.number() //optionally stay behind head of chain
 });
 
 const lock = new Mutex();
@@ -21,6 +22,7 @@ export default class PollingDataSource extends BlockDataSource {
         this.interval = props.interval || 10000;
         this.lastBlock = props.lastKnownBlock;
         this.polling = false;
+        this.lagBlocks = props.lagBlocks || 0;
         this.stopCallback = null;
         [
             'start',
@@ -85,7 +87,8 @@ export default class PollingDataSource extends BlockDataSource {
                             log.error("Could not determine current block in polling loop, waiting for next run");
                             return;
                         }
-    
+                        currentBlock -= this.lagBlocks;
+                        
                         if(this.lastBlock !== currentBlock) {
                             while(this.lastBlock !== currentBlock) {
                                 going = await this._isPolling();
