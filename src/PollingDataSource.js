@@ -88,6 +88,12 @@ export default class PollingDataSource extends BlockDataSource {
     
                         if(this.lastBlock !== currentBlock) {
                             while(this.lastBlock !== currentBlock) {
+                                going = await this._isPolling();
+                                if(!going) {
+                                    log.info("Polling stopped");
+                                    break;
+                                }
+
                                 //try to poll for new block
                                 await ctx.invoke(this.web3.eth.getBlock, async (e, b)=>{
                                     if(e) {
