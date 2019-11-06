@@ -1,7 +1,7 @@
 import Handler from '../Handler';
 import {Logger} from 'buidl-utils';
 
-const log = new Logger({component: "ABIDecodeHandler"});
+const logger = new Logger({component: "ABIDecodeHandler"});
 
 export default class ABIDecodeHandler extends Handler {
     constructor(abis) {
@@ -115,10 +115,10 @@ export default class ABIDecodeHandler extends Handler {
               };
               out.push(payload);
             } else {
-              log.debug("Failed to decode event", def.name);
+              logger.debug("Failed to decode event", def.name, log);
             }
           } else {
-            log.debug("No log definition with signature", sig);
+            logger.debug("No log definition with signature", sig, log);
           }
         }
         return out;

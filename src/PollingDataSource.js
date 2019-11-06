@@ -73,7 +73,7 @@ export default class PollingDataSource extends BlockDataSource {
                     try {
                         //get the latest block to see if we need to poll at all
                         let currentBlock = 0;
-                        await ctx.invoke(this.web3.eth.getBlockNumber, async (e, n)=>{
+                        await ctx.invoke(this.web3.eth.getBlockNumber, (e, n)=>{
                             if(e) {
                                 this.fatalError = e;
                             } else {
@@ -87,24 +87,26 @@ export default class PollingDataSource extends BlockDataSource {
                         }
     
                         if(this.lastBlock !== currentBlock) {
-                            //try to poll for new block
-                            await ctx.invoke(this.web3.eth.getBlock, async (e, b)=>{
-                                if(e) {
-                                    fatalError = e;
-                                } else if(b) {
-                                    if(this.lastBlock != b.number) {
-                                        log.debug("Sending block",b.number,"to callback");
-                                        try {
-                                            await cb(null, b);
-                                        } catch (e2) {
-                                            log.error("Problem calling back with new block", e2);
+                            while(this.lastBlock !== currentBlock) {
+                                //try to poll for new block
+                                await ctx.invoke(this.web3.eth.getBlock, async (e, b)=>{
+                                    if(e) {
+                                        fatalError = e;
+                                    } else if(b) {
+                                        if(this.lastBlock != b.number) {
+                                            log.debug("Sending block",b.number,"to callback");
+                                            try {
+                                                await cb(null, b);
+                                            } catch (e2) {
+                                                log.error("Problem calling back with new block", e2);
+                                            }
                                         }
+                                        this.lastBlock = b.number;
+                                    } else {
+                                        log.debug("Getting no block back from web3 for block:", this.lastBlock+1);
                                     }
-                                    this.lastBlock = b.number;
-                                } else {
-                                    log.debug("Getting no block back from web3 for block:", this.lastBlock+1);
-                                }
-                            }, this.lastBlock+1, true);
+                                }, this.lastBlock+1, true);
+                            }
                         } else {
                             log.debug("No new blocks to retrieve, waiting for next poll cycle", this.lastBlock, " === ", currentBlock);
                         }
